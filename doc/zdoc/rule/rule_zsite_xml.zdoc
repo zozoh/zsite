@@ -1,0 +1,71 @@
+#title: _zsite_.xml 的格式
+#author: zozoh(zozohtnt@gmail.com)
+#index:0,1
+------------------------------------------------------------------------
+为什么需要 _zsite_.xml
+
+    一个网站，总有一些和业务相关的术语，也有一些通用的配置信息。因此我
+    给出了一个 _zsite_.xml 作为整个网站的全局配置。
+
+    这个文件是整个 zSite 制作的网站，唯一的配置信息存放的地点。
+
+------------------------------------------------------------------------
+_zsite_.xml 的格式
+
+    {{{
+    <?xml version="1.0"?>
+    <zsite>
+        <!--
+        #定义了一组变量，在网页|组件|模板的任何地方，都可以用 ${变量名} 来
+        #使用这个变量，变量本身被当作字符串来看到 (用 CDATA 来包裹)
+        -->
+        <vars>
+           <var name="siteName">My Site</var> 
+           <var name="title2"><b>My Title</b></var>
+        </vars>
+        
+        <!--
+        #网站默认的模板文件，如果没有声明，默认采用 default 模板
+        -->
+        <default-tmpl name="default">
+            <set name="banner"><lib name="banner"/></set>
+        </default-tmpl>
+
+        <!--
+        #网站的各个页面的一些设定, 除了 regex 以外，其他的选项都为可选
+        -->
+        <pages>
+            <page>
+                <regex>.*</regex>      <!--// 根据路径来匹配网页-->
+                <tmpl name="pageX">    <!--// 指定了模板，没有的话，用 default 模板 -->
+                    <set name="banner"><lib name="banner_abc"/></set>
+                </tmpl>
+                <vars>                 <!--// 页面的初始变量们 -->
+                   <var name="siteName">My Site</var> 
+                   <var name="title2"><b>My Title</b></var>
+                </vars>
+            </page>
+        </pages>
+
+        <!--
+        #这里可以用来重定义网站的路径，下面这些标签都可以没有，如果有，则是
+        #用来修改网站几个关键目录的存放地点。
+        #尤其是，你可以指定一个绝对路径，比如对于 tmpl 的指定：
+         * Windows     : "C:/workspace/my-common-tmpl"
+         * Linux/Unix  : "/home/mine/workspace/my-common-tmpl"
+        #否则，会被认为是一个相对与 zsite-home 的路径
+        -->
+        <dirs>
+            <dir name="tmpl">_tmpl</dir>
+            <dir name="libs">_libs</dir>
+            <dir name="imgs">imgs</dir>
+            <dir name="css">css</dir>
+            <dir name="js">js</dir>
+        </dirs>
+    </zsite>
+    }}}
+
+------------------------------------------------------------------------
+如果没有 _zsite_.xml 会发生什么
+
+    没有也木有关系

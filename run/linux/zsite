@@ -1,0 +1,10 @@
+#!/bin/sh
+export JAVA_HOME=~/Library/Java/JDK1.6
+export NUTZ_HOME=~/workspace/galaxy/nutz/bin/
+export ZSITE_HOME=~/workspace/galaxy/zsite/bin/
+
+export CLASSPATH=.:$JAVA_HOME/lib/tools.jar:$JAVA_HOME/lib/dt.jar:$JAVA_HOME/jre/rt.jar
+export CLASSPATH=$CLASSPATH:$ZSITE_HOME
+export CLASSPATH=$CLASSPATH:$NUTZ_HOME
+
+java org.nutz.zsite.ZSite $*

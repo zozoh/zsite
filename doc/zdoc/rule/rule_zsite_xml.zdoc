@@ -28,7 +28,7 @@ _zsite_.xml 的格式
         #网站默认的模板文件，如果没有声明，默认采用 default 模板
         -->
         <default-tmpl name="default">
-            <set name="banner"><lib name="banner"/></set>
+            <set name="banner" type="lib">banner</set>
         </default-tmpl>
 
         <!--
@@ -38,7 +38,7 @@ _zsite_.xml 的格式
             <page>
                 <regex>.*</regex>      <!--// 根据路径来匹配网页-->
                 <tmpl name="pageX">    <!--// 指定了模板，没有的话，用 default 模板 -->
-                    <set name="banner"><lib name="banner_abc"/></set>
+                    <set name="banner" type="lib">banner</set>
                 </tmpl>
                 <vars>                 <!--// 页面的初始变量们 -->
                    <var name="siteName">My Site</var> 

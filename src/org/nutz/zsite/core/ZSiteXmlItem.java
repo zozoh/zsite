@@ -9,12 +9,12 @@ import org.w3c.dom.Element;
  */
 public abstract class ZSiteXmlItem {
 
-	protected ZSiteXml siteXml;
+	protected ZSiteXml xml;
 
 	protected Element ele;
 
-	public ZSiteXmlItem(ZSiteXml siteXml, Element ele) {
-		this.siteXml = siteXml;
+	public ZSiteXmlItem(ZSiteXml xml, Element ele) {
+		this.xml = xml;
 		this.ele = ele;
 	}
 

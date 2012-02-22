@@ -23,6 +23,11 @@ import static org.nutz.zsite.util.ZSiteLogs.*;
 public abstract class ZSite {
 
 	/**
+	 * 主区域的占位符名
+	 */
+	public static final String PH_TMPL_MAIN = "%main";
+
+	/**
 	 * @see #render(File, File, String, boolean)
 	 */
 	public static int render(String src, String dest, String pattern, boolean clean) {

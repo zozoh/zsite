@@ -31,13 +31,13 @@ public class PageSetting extends ZSiteXmlItem {
 	 */
 	private Map<String, String> vars;
 
-	public PageSetting(ZSiteXml siteXml, Element ele) {
-		super(siteXml, ele);
+	public PageSetting(ZSiteXml xml, Element ele) {
+		super(xml, ele);
 		regex = Pattern.compile(Xmls.get(ele, "regex"));
 
 		Element eleTmpl = Xmls.firstChild(ele, "tmpl");
 		if (null != eleTmpl)
-			tmplSetting = new TmplSetting(siteXml, eleTmpl);
+			tmplSetting = new TmplSetting(xml, eleTmpl);
 
 		vars = new HashMap<String, String>();
 		Element eleVars = Xmls.firstChild(ele, "vars");
@@ -50,7 +50,7 @@ public class PageSetting extends ZSiteXmlItem {
 	}
 
 	public boolean match(File f) {
-		return regex.matcher(siteXml.getSiteHome().getSitePath(f)).find();
+		return regex.matcher(xml.home().getSitePath(f)).find();
 	}
 
 	public boolean hasTmplSetting() {
@@ -62,7 +62,8 @@ public class PageSetting extends ZSiteXmlItem {
 	}
 
 	public void overlapVars(Map<String, String> map) {
-		map.putAll(vars);
+		if (null != vars && vars.size() > 0)
+			map.putAll(vars);
 	}
 
 }

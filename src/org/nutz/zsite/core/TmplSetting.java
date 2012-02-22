@@ -6,6 +6,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.nutz.lang.Each;
+import org.nutz.lang.Files;
 import org.nutz.lang.Lang;
 import org.nutz.lang.Mirror;
 import org.nutz.lang.Strings;
@@ -66,6 +67,8 @@ public class TmplSetting extends ZSiteXmlItem {
 
 		// 预先解析模板
 		tmplFile = xml.dir_tmpl().getFile(name);
+		if (!tmplFile.exists())
+			Files.write(tmplFile, "${%main}");
 		segment = Segments.read(tmplFile);
 
 		// 查找预装配的占位符

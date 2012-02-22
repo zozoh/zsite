@@ -61,7 +61,7 @@ public class ZSiteXml {
 		log0f("open '%s' ...", xmlFile.getName());
 		Element root = Xmls.xml(xmlFile).getDocumentElement();
 
-		log0("understand DOM '%s'");
+		log0("understand DOM");
 		/*
 		 * Dirs
 		 */
@@ -69,8 +69,8 @@ public class ZSiteXml {
 		Element eleDirs = Xmls.firstChild(root, "dirs");
 		for (Element eleDir : Xmls.children(eleDirs, "dir")) {
 			String name = eleDir.getAttribute("name");
-			String value = Strings.trim(eleDir.getTextContent());
-			mirror.setValue(this, name + "Dir", value);
+			SiteDir value = new SiteDir(this, eleDir);
+			mirror.setValue(this, "dir_" + name, value);
 		}
 		// 检查 ...
 		for (Field fld : this.getClass().getDeclaredFields()) {

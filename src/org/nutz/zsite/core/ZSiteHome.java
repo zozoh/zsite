@@ -13,6 +13,7 @@ import org.nutz.doc.zdoc.ZDocParser;
 import org.nutz.lang.Files;
 import org.nutz.lang.Lang;
 import org.nutz.lang.Strings;
+import org.nutz.lang.Times;
 import org.nutz.lang.segment.Segment;
 import org.nutz.lang.segment.Segments;
 import org.nutz.lang.util.Context;
@@ -81,11 +82,11 @@ public class ZSiteHome {
 				if (f.isHidden())
 					return false;
 				// 忽略模板目录
-				if (!xml.dir_tmpl().contains(f))
+				if (xml.dir_tmpl().contains(f))
 					return false;
 
 				// 忽略组件目录
-				if (!xml.dir_libs().contains(f))
+				if (xml.dir_libs().contains(f))
 					return false;
 
 				// 匹配
@@ -103,6 +104,8 @@ public class ZSiteHome {
 
 				// HTML
 				if (suffixName.matches("^(htm|html)$")) {
+					log1f(" - html : '%s'", Disks.getRelativePath(home, f));
+
 					// 预处理文件
 					String html = siteHome.evalText(f);
 
@@ -117,9 +120,11 @@ public class ZSiteHome {
 
 					// 替换 HTML
 					int pos = html.indexOf("</head>");
-					String before = html.substring(0, pos);
-					String after = html.substring(pos);
-					html = before + sb + after;
+					if (pos > 0) {
+						String before = html.substring(0, pos);
+						String after = html.substring(pos);
+						html = before + sb + after;
+					}
 
 					// 写入目标文件
 					File df = siteHome.createDestFileIfNoExists(dest, f);
@@ -129,6 +134,8 @@ public class ZSiteHome {
 				}
 				// zDoc
 				else if (suffixName.matches("^(zdoc|txt)$")) {
+					log1f(" - doc : '%s'", Disks.getRelativePath(home, f));
+
 					// 预处理文件
 					String text = siteHome.evalText(f);
 
@@ -171,7 +178,7 @@ public class ZSiteHome {
 		};
 
 		// 开始访问
-		Disks.visitFile(dest, visitor, flt);
+		Disks.visitFile(home, visitor, flt);
 
 		// 返回
 		return re[0];
@@ -191,6 +198,9 @@ public class ZSiteHome {
 		TmplSetting tmpl = xml.default_tmpl();
 
 		Map<String, String> vars = new HashMap<String, String>();
+		// 设置默认变量
+		vars.put("now", Times.sDT(Times.now()));
+		vars.put("file.name", f.getName());
 
 		// 得到这个文件的变量以及模板
 		vars.putAll(xml.vars());

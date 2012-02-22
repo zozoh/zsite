@@ -94,7 +94,7 @@ public class SiteDir extends ZSiteXmlItem {
 
 	public boolean contains(File f) {
 		String relativePath = Disks.getRelativePath(dir, f);
-		return null != relativePath && relativePath.startsWith("..");
+		return null != relativePath && !relativePath.startsWith("..");
 	}
 
 	public File getFile(String path) {

@@ -31,7 +31,9 @@ public abstract class ZSite {
 	 * @see #render(File, File, String, boolean)
 	 */
 	public static int render(String src, String dest, String pattern, boolean clean) {
-		return render(new File(Disks.absolute(src)), new File(Disks.absolute(dest)), pattern, clean);
+		src = Disks.absolute(src);
+		dest = Disks.normalize(dest);
+		return render(new File(src), new File(dest), pattern, clean);
 	}
 
 	/**
@@ -49,6 +51,25 @@ public abstract class ZSite {
 	 * @return 处理了多少个页面对象
 	 */
 	public static int render(File src, File dest, String regex, boolean clean) {
+		/*
+		 * 检查源
+		 */
+		if (null == src || !src.exists()) {
+			log0("src don't exists : " + src);
+			System.exit(0);
+			return -1;
+		}
+		/*
+		 * 检查目标
+		 */
+		if (null == dest) {
+			log0("null dest!");
+			System.exit(0);
+			return -1;
+		} else if (!dest.exists()) {
+			Files.makeDir(dest);
+		}
+
 		Stopwatch sw = Stopwatch.create();
 		log0f(	"start render '%s' to '%s' (%s) since '%s'",
 				src.getAbsolutePath(),
@@ -56,6 +77,7 @@ public abstract class ZSite {
 				regex,
 				Times.sDTms(Times.now()));
 		sw.start();
+
 		/*
 		 * 开始实现 ...
 		 */
@@ -67,7 +89,7 @@ public abstract class ZSite {
 		sw.stop();
 		log0f("done for rendering %d pages in [%s]", re, sw.toString());
 
-		throw Lang.noImplement();
+		return re;
 	}
 
 	/**

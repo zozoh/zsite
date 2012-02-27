@@ -40,6 +40,7 @@
     #否则，会被认为是一个相对与 zsite-home 的路径
     -->
     <dirs>
+    	<dir name="msgs">_msgs</dir>
         <dir name="tmpl">_tmpl</dir>
         <dir name="libs">_libs</dir>
         <dir name="imgs">imgs</dir>

@@ -1,6 +1,7 @@
 package org.nutz.zsite.core;
 
 import java.io.File;
+import java.io.FileFilter;
 import java.io.FilenameFilter;
 import java.util.ArrayList;
 import java.util.List;
@@ -66,6 +67,10 @@ public class SiteDir extends ZSiteXmlItem {
 			if (fnm.equalsIgnoreCase("page")) {
 				list.add(f);
 			}
+			// jquery, 自动添加
+			else if (fnm.startsWith("jquery")) {
+				list.add(f);
+			}
 			// 符合路径开头
 			else if (pagePath.startsWith(fpath)) {
 				list.add(f);
@@ -97,7 +102,19 @@ public class SiteDir extends ZSiteXmlItem {
 		return null != relativePath && !relativePath.startsWith("..");
 	}
 
-	public File getFile(String path) {
-		return Files.getFile(dir, path);
+	public File[] listFolders() {
+		return this.dir.listFiles(new FileFilter() {
+			public boolean accept(File f) {
+				return f.isDirectory() && !f.isHidden();
+			}
+		});
+	}
+
+	public File getFile(String name) {
+		return Files.getFile(dir, name);
+	}
+
+	public File getFile(String name, String suffix) {
+		return Files.getFile(dir, name + suffix);
 	}
 }

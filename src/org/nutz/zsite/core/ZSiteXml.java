@@ -1,6 +1,7 @@
 package org.nutz.zsite.core;
 
 import java.io.File;
+import java.io.IOException;
 import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -9,8 +10,10 @@ import java.util.Map;
 
 import org.nutz.lang.Lang;
 import org.nutz.lang.Mirror;
+import org.nutz.lang.Streams;
 import org.nutz.lang.Strings;
 import org.nutz.lang.Xmls;
+import org.nutz.lang.util.MultiLineProperties;
 import org.w3c.dom.Element;
 
 import static org.nutz.zsite.util.ZSiteLogs.*;
@@ -42,7 +45,13 @@ public class ZSiteXml {
 	 */
 	private List<PageSetting> pages;
 
+	/**
+	 * 本站点将输出成多少中语言。 如果为 null 或者 size 为 0, 则没有多国语言设定
+	 */
+	private Map<String, Map<String, String>> locals;
+
 	/* ==================================================== 网站的几个关键路径== */
+	private SiteDir dir_msgs;
 	private SiteDir dir_tmpl;
 	private SiteDir dir_libs;
 	private SiteDir dir_imgs;
@@ -82,6 +91,31 @@ public class ZSiteXml {
 			}
 		}
 
+		// 检查多国语言设定
+		locals = new HashMap<String, Map<String, String>>();
+		File[] localDirs = dir_msgs.listFolders();
+		for (File localDir : localDirs) {
+			String key = localDir.getName();
+			Map<String, String> msgs = locals.get(key);
+			if (null == msgs) {
+				msgs = new HashMap<String, String>();
+				locals.put(key, msgs);
+			}
+
+			for (File f : localDir.listFiles()) {
+				if (f.isFile() && f.getName().endsWith(".properties")) {
+					MultiLineProperties pp = new MultiLineProperties();
+					try {
+						pp.load(Streams.fileInr(f));
+					}
+					catch (IOException e) {
+						throw Lang.wrapThrow(e);
+					}
+					msgs.putAll(pp);
+				}
+			}
+		}
+
 		/*
 		 * vars
 		 */
@@ -114,6 +148,14 @@ public class ZSiteXml {
 		return home;
 	}
 
+	public Map<String, Map<String, String>> locals() {
+		return locals;
+	}
+
+	public boolean hasLocals() {
+		return null != locals && locals.size() > 0;
+	}
+
 	public Map<String, String> vars() {
 		return vars;
 	}
@@ -124,6 +166,10 @@ public class ZSiteXml {
 
 	public List<PageSetting> pages() {
 		return pages;
+	}
+
+	public SiteDir dir_msgs() {
+		return dir_msgs;
 	}
 
 	public SiteDir dir_tmpl() {

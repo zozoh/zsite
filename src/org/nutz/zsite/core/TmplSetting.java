@@ -47,7 +47,8 @@ public class TmplSetting extends ZSiteXmlItem {
 	 */
 	public String wrapContent(Map<String, String> vars, String mainContent) {
 		// 准备自己的上下文
-		Context tmplContext = xml.home().createContext(tmplFile, vars, segment);
+		PageRendering ing = new PageRendering(xml,tmplFile, vars);
+		Context tmplContext = ing.createContext();
 
 		// 填充组件们
 		for (Filler filler : fillers)
@@ -66,7 +67,7 @@ public class TmplSetting extends ZSiteXmlItem {
 		name = ele.getAttribute("name");
 
 		// 预先解析模板
-		tmplFile = xml.dir_tmpl().getFile(name);
+		tmplFile = xml.dir_tmpl().getFile(name, ".html");
 		if (!tmplFile.exists())
 			Files.write(tmplFile, "${%main}");
 		segment = Segments.read(tmplFile);

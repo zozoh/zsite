@@ -3,6 +3,7 @@ package org.nutz.zsite;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 import org.nutz.lang.Files;
 import org.nutz.lang.Lang;
@@ -21,6 +22,26 @@ import static org.nutz.zsite.util.ZSiteLogs.*;
  * @author zozoh(zozohtnt@gmail.com)
  */
 public abstract class ZSite {
+
+	private static ThreadLocal<Map<String, String>> _MSGS_ = new ThreadLocal<Map<String, String>>();
+	private static ThreadLocal<String> LOCAL_NAME = new ThreadLocal<String>();
+
+	public static void setLocal(String name, Map<String, String> msgs) {
+		LOCAL_NAME.set(name);
+		_MSGS_.set(msgs);
+	}
+
+	public static void clearLocal() {
+		setLocal(null, null);
+	}
+
+	public static Map<String, String> getLocal() {
+		return _MSGS_.get();
+	}
+
+	public static String getLocalName() {
+		return LOCAL_NAME.get();
+	}
 
 	/**
 	 * 主区域的占位符名

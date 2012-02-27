@@ -14,6 +14,11 @@ zSite 的目录是什么样子
        |              # 它下面放置一个 site 所有的内容
        |
        |--_zsite_.xml  # 一个 XML 文件，zSite 从这个文件里读取某些网页都要用到的信息
+       |--[_msgs]     # 网站的多国语言设定
+       |    |--[zh_CN]       # 一个语言一个目录，这个目录里面所有的 properties 文件将
+       |          |          # 组合成一个消息 Map
+       |          |--zh_CN.messages
+       |
        |--[_tmpl]     # 网站模板文件存放的目录 "_tmpl"，我称它为 "zsite_tmpl_home"
        |    |--[default]     # 一个模板就是一个目录，里面包含了这个组件要用到的 js 和 css
        |          |--default.html   # 模板的 HTML 代码片段，与模板同名的规定便于你同时

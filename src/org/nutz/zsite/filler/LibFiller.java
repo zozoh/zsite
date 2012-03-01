@@ -19,7 +19,7 @@ public class LibFiller extends Filler {
 
 	public void init(ZSiteXml xml) {
 		this.xml = xml;
-		this.libFile = xml.dir_libs().getFile(this.getValue());
+		this.libFile = xml.dir_libs().getFile(this.getValue(), ".html");
 		this.segment = Segments.read(libFile);
 	}
 

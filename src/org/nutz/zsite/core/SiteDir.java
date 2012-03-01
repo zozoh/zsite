@@ -4,6 +4,7 @@ import java.io.File;
 import java.io.FileFilter;
 import java.io.FilenameFilter;
 import java.util.ArrayList;
+import java.util.LinkedList;
 import java.util.List;
 
 import org.nutz.lang.Files;
@@ -57,7 +58,13 @@ public class SiteDir extends ZSiteXmlItem {
 		// 准备返回列表
 		String pageName = Files.getMajorName(pageFile);
 		String pagePath = file_path_name(pageFile);
-		List<File> list = new ArrayList<File>(fs.length);
+
+		File jquery = null;
+		List<File> jqs = new LinkedList<File>();
+		File page = null;
+		List<File> ps = new LinkedList<File>();
+
+		// 查找
 		for (File f : fs) {
 			// 得到当前文件路径和名称信息
 			String fnm = Files.getMajorName(f);
@@ -65,29 +72,47 @@ public class SiteDir extends ZSiteXmlItem {
 
 			// page.xxx
 			if (fnm.equalsIgnoreCase("page")) {
-				list.add(f);
+				page = f;
+			}
+			// jquery, 自动添加
+			else if (fnm.equalsIgnoreCase("jquery")) {
+				jquery = f;
 			}
 			// jquery, 自动添加
 			else if (fnm.startsWith("jquery")) {
-				list.add(f);
+				jqs.add(f);
 			}
 			// 符合路径开头
 			else if (pagePath.startsWith(fpath)) {
-				list.add(f);
+				ps.add(f);
 			}
 			// 精确匹配
 			else if (fnm.equals("p_" + pageName)) {
-				list.add(f);
+				ps.add(f);
 			}
 			// 名称包含
 			else if (fpath.startsWith("p___")) {
 				String nm = fpath.substring("p___".length());
 				if (pageName.contains(nm))
-					list.add(f);
+					ps.add(f);
 			}
 		}
 
 		// 返回
+		List<File> list = new ArrayList<File>(fs.length);
+
+		if (null != jquery)
+			list.add(jquery);
+
+		if (jqs.size() > 0)
+			list.addAll(jqs);
+
+		if (null != page)
+			list.add(page);
+
+		if (ps.size() > 0)
+			list.addAll(ps);
+
 		return list;
 	}
 

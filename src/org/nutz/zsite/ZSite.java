@@ -49,6 +49,11 @@ public abstract class ZSite {
 	public static final String PH_TMPL_MAIN = "%main";
 
 	/**
+	 * 页内导航区域的占位符前缀
+	 */
+	public static final String PH_TMPL_NAV = "%nav:";
+
+	/**
 	 * @see #render(File, File, String, boolean)
 	 */
 	public static int render(String src, String dest, String pattern, boolean clean) {

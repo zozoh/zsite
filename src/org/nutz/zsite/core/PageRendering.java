@@ -7,6 +7,7 @@ import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import org.nutz.lang.Files;
 import org.nutz.lang.Lang;
 import org.nutz.lang.Strings;
 import org.nutz.lang.Times;
@@ -53,6 +54,12 @@ public class PageRendering {
 			vars.put("now", Times.sDT(Times.now()));
 			vars.put("file.name", pageFile.getName());
 
+			// 设置 pageName
+			String path = xml.home().getSiteName(pageFile);
+			String pageName = Strings.sBlank(	ZSite.getLocal().get("pgnm." + path),
+												Files.getMajorName(pageFile));
+			vars.put("pageName", pageName);
+
 			// 得到这个文件的变量以及模板
 			vars.putAll(xml.vars());
 			for (PageSetting ps : xml.pages()) {
@@ -77,43 +84,54 @@ public class PageRendering {
 		for (String key : pageSegment.keys()) {
 			// 多国语言占位符
 			if (key.startsWith("#")) {
-				String msgkey = key.substring(1);
-				if (null != msgs && msgs.containsKey(msgkey)) {
-					context.set(key, msgs.get(msgkey));
-				} else {
-					context.set(key, "${" + key + "}");
-				}
-			}
-			// 图片引入占位符
-			else if (key.startsWith("img:")) {
-				String[] ss = Strings.splitIgnoreBlank(key.substring("img:".length()));
-				StringBuilder sb = new StringBuilder();
-				for (String s : ss) {
-					String src = xml.home().normalizeImageSrc(pageFile, s);
-					sb.append(String.format("\n<img class=\"site_pic\" src=\"%s\"> ", src));
-				}
-				context.set(key, sb);
+				setLocalToContext(key, context, msgs, key.substring(1));
 			}
 			// 引入组件的占位符
 			else if (key.startsWith("@")) {
-				String libName = key.substring(1);
-				File libFile = xml.dir_libs().getFile(libName + ".html");
-				// 找到组件
-				if (null != libFile && libFile.exists()) {
-					PageRendering libIng = new PageRendering(xml, libFile, vars);
-					context.set(key, libIng.text());
-				}
-				// 未找到组件
-				else {
-					context.set("key", "${@" + key + "}");
-				}
+				setLibToContext(key, context, key.substring(1));
 			}
 			// 普通占位符
 			else {
-				context.set(key, Strings.sBlank(vars.get(key), "${" + key + "}"));
+				String val = Strings.sBlank(vars.get(key), "${" + key + "}");
+				// 变量是多国语言
+				if (val.startsWith("#")) {
+					setLocalToContext(key, context, msgs, val.substring(1));
+				}
+				// 变量是组件
+				else if (val.startsWith("@")) {
+					setLibToContext(key, context, val.substring(1));
+				}
+				// 变量是普通字符串
+				else {
+					context.set(key, val);
+				}
 			}
 		}
 		return context;
+	}
+
+	private void setLibToContext(String key, Context context, String libName) {
+		File libFile = xml.dir_libs().getFile(libName + ".html");
+		// 找到组件
+		if (null != libFile && libFile.exists()) {
+			PageRendering libIng = new PageRendering(xml, libFile, vars);
+			context.set(key, libIng.text());
+		}
+		// 未找到组件
+		else {
+			context.set(key, "${@" + key + "}");
+		}
+	}
+
+	private void setLocalToContext(	String key,
+									Context context,
+									Map<String, String> msgs,
+									String msgkey) {
+		if (null != msgs && msgs.containsKey(msgkey)) {
+			context.set(key, msgs.get(msgkey));
+		} else {
+			context.set(key, "${" + key + "}");
+		}
 	}
 
 	/**
@@ -166,7 +184,11 @@ public class PageRendering {
 			}
 			// 如果是链接
 			else {
-				body.append(xml.home().normalizePageLink(pageFile, lnk));
+				lnk = xml.home().normalizePageLink(pageFile, lnk);
+				Matcher ma = HREF.matcher(lnk);
+				if (ma.find())
+					lnk = ma.group(1) + ".html";
+				body.append(lnk);
 			}
 			body.append(end);
 			off = m.end();
@@ -176,6 +198,8 @@ public class PageRendering {
 
 		return before + sb + body.toString();
 	}
+
+	private static Pattern HREF = Pattern.compile("^(.*)([.])(zdoc|txt)$");
 
 	private static Pattern LNK = Pattern.compile(	"(src=\"|href=\")([^\"]+)(\")",
 													Pattern.CASE_INSENSITIVE);

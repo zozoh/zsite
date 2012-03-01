@@ -3,6 +3,9 @@ package org.nutz.zsite.core;
 import java.io.File;
 import java.io.FileFilter;
 import java.io.IOException;
+
+import org.nutz.doc.meta.ZDoc;
+import org.nutz.doc.zdoc.ZDocParser;
 import org.nutz.lang.Files;
 import org.nutz.lang.Lang;
 import org.nutz.lang.Strings;
@@ -10,6 +13,8 @@ import org.nutz.lang.util.Disks;
 import org.nutz.lang.util.FileVisitor;
 import org.nutz.zsite.ZSite;
 import org.nutz.zsite.util.Regex;
+import org.nutz.zsite.util.SiteZDocRender;
+
 import static org.nutz.zsite.util.ZSiteLogs.*;
 
 /**
@@ -78,6 +83,10 @@ public class ZSiteHome {
 				if (xml.dir_libs().contains(f))
 					return false;
 
+				// 目录的话，深层进入
+				if (f.isDirectory())
+					return true;
+
 				// 匹配
 				String path = Disks.getRelativePath(home, f);
 				return reg.match(path);
@@ -93,10 +102,14 @@ public class ZSiteHome {
 
 				// HTML
 				if (suffixName.matches("^(htm|html)$")) {
-					log2f(" - html : '%s'", Disks.getRelativePath(home, f));
+					// 准备渲染
+					PageRendering ing = new PageRendering(xml, f);
+
+					log2f(	" - html : %9s %% '%s' ",
+							ing.tmpl().name(),
+							Disks.getRelativePath(home, f));
 
 					// 预处理文件
-					PageRendering ing = new PageRendering(xml, f);
 					String html = ing.text();
 					html = ing.wrapText(html);
 					html = ing.normalizeHtml(html);
@@ -107,9 +120,41 @@ public class ZSiteHome {
 					// 记数
 					re[0]++;
 				}
+				// ZDoc
+				else if (suffixName.matches("^(zdoc|txt)$")) {
+					// 准备渲染
+					PageRendering ing = new PageRendering(xml, f);
+
+					log2f(	" - zdoc : %9s %% '%s'",
+							ing.tmpl().name(),
+							Disks.getRelativePath(home, f));
+
+					// 准备渲染器
+					ZDocParser parser = new ZDocParser();
+					SiteZDocRender render = new SiteZDocRender();
+
+					// 预处理文件
+					String text = ing.text();
+
+					// 解析
+					ZDoc doc = parser.parse(Lang.inr(text));
+
+					// 渲染
+					String html = render.render(doc).toString();
+
+					html = ing.wrapText(html);
+					html = ing.normalizeHtml(html);
+
+					// 写入目标文件
+					File df = siteHome.createDestFileIfNoExists(dest, f);
+					Files.write(df, html);
+					// 记数
+					re[0]++;
+
+				}
 				// 图片 JS 以及 CSS 则 copy
 				else if (suffixName.matches("^(js|css|png|jpg|jpeg|gif|swf)$")) {
-					log2f(" - copy : %s", siteHome.getSitePath(f));
+					log2f(" ------ : %s", siteHome.getSitePath(f));
 
 					File df = siteHome.createDestFileIfNoExists(dest, f);
 					Files.copy(f, df);
@@ -227,6 +272,13 @@ public class ZSiteHome {
 		catch (IOException e) {
 			throw Lang.wrapThrow(e);
 		}
+	}
+
+	public String getSiteName(File f) {
+		String path = getSitePath(f);
+		int pos = path.lastIndexOf('.');
+		path = path.substring(0, pos);
+		return path.replaceAll("[\\\\/]", "_");
 	}
 
 	/**

@@ -12,7 +12,7 @@
     #网站默认的模板文件，如果没有声明，默认采用 default 模板
     -->
     <default-tmpl name="default">
-        <!-- set name="banner"><lib name="banner"/></set-->
+        <!-- set name="banner" type="lib">banner</set-->
     </default-tmpl>
 
     <!--

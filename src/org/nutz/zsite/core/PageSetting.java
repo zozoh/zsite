@@ -41,7 +41,7 @@ public class PageSetting extends ZSiteXmlItem {
 
 		vars = new HashMap<String, String>();
 		Element eleVars = Xmls.firstChild(ele, "vars");
-		if (null != eleTmpl) {
+		if (null != eleVars) {
 			for (Element eleVar : Xmls.children(eleVars, "var")) {
 				this.vars.put(	Strings.trim(eleVar.getAttribute("name")),
 								Strings.trim(eleVar.getTextContent()));
